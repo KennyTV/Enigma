@@ -262,6 +262,7 @@ public class EnigmaProject {
 
 			//create a common instance outside the loop as mappings shouldn't be changing while this is happening
 			Decompiler decompiler = decompilerService.create(compiled::get, new SourceSettings(false, false));
+            Decompiler altDecompiler = cuchaz.enigma.source.Decompilers.CFR.create(compiled::get, new SourceSettings(false, false)); // hacks
 
 			AtomicInteger count = new AtomicInteger();
 
@@ -273,6 +274,11 @@ public class EnigmaProject {
 						try {
 							source = decompileClass(translatedNode, decompiler);
 						} catch (Throwable throwable) {
+							// hacks start
+							try {
+								source = decompileClass(translatedNode, altDecompiler);
+							} catch (Throwable throwable2) {
+							// hacks end
 							switch (errorStrategy) {
 								case PROPAGATE: throw throwable;
 								case IGNORE: break;
@@ -283,6 +289,7 @@ public class EnigmaProject {
 									break;
 								}
 							}
+							} // hack
 						}
 
 						if (source == null) {
